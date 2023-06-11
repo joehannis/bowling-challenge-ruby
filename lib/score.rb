@@ -1,8 +1,9 @@
 class Score
-  def initialize
+  def initialize(io = $stdout)
     @running_score = []
     @bonus = []
     @frame_index = 0
+    @io = io
   end
 
   def score_calculation(turn)
@@ -16,7 +17,6 @@ class Score
       previous_frame = @running_score[@frame_index - 1]
       previous_frame[:StrikeBonus1] = 10
       previous_frame[:StrikeBonus2] = 10
-      binding.irb
     else
       calculate_bonus(@turn)
     end
@@ -36,8 +36,11 @@ class Score
       frame = @running_score[index]
       frame_info = "Frame #{index + 1}: Roll 1 = #{frame[1]}, Roll 2 = #{frame[2]}"
       frame_info += ", Bonus = #{frame[:SpareBonus]}" if frame.include?(:SpareBonus)
-      frame_info += ", Strike Bonus 1 = #{frame[:StrikeBonus1]}, Strike Bonus 2 = #{frame[:StrikeBonus2]}" if frame.include?(:StrikeBonus1)
-      frame_info += ", Strike Bonus Roll 1 = #{frame[:bonus_roll_1]}, Strike Bonus Roll 2 = #{frame[:bonus_roll_2]}" if frame.include?(:bonus_roll_1)
+      if @running_score[index - 1].include?(:bonus_roll_1)
+        frame_info += ", Strike Bonus Roll 1 = #{frame[:bonus_roll_1]}, Strike Bonus Roll 2 = #{frame[:bonus_roll_2]}"
+      elsif frame.include?(:StrikeBonus1)
+        frame_info += ", Strike Bonus 1 = #{frame[:StrikeBonus1]}, Strike Bonus 2 = #{frame[:StrikeBonus2]}"
+      end
       puts frame_info
     end
     puts "Total Score: #{@total_score}"
