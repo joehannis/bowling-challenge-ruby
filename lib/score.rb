@@ -2,41 +2,74 @@ class Score
   def initialize
     @running_score = []
     @bonus = []
-    @index = 0
+    @frame_index = 0
   end
 
-  def score_calculation(turn, index)
-    @index = index
+  def score_calculation(turn)
     @running_score << turn
-    total_score = 0
-   
-    if @index < 10
-      if @running_score[-2][1] == 10
-        @bonus << turn[1]
-        @bonus << turn[2]
-        @running_score[-2][:StrikeBonus1] = turn[1]
-        @running_score[-2][:StrikeBonus2] = turn[2]
-      end
+    @total_score = 0
+    @turn = turn
+  
+    if @frame_index >= 1 && @running_score[@frame_index - 1][1] == 10 && @running_score[@frame_index - 2][1] == 10
+      @bonus << 10
+      @bonus << 10
+      previous_frame = @running_score[@frame_index - 1]
+      previous_frame[:StrikeBonus1] = 10
+      previous_frame[:StrikeBonus2] = 10
+      binding.irb
+    else
+      calculate_bonus(@turn)
     end
-    if @index < 10
-      if @running_score[-2][1] + @running_score[-2][2] == 10 && @running_score[-2][1] < 10
-        @bonus << turn[1]
-        @running_score[-2][:SpareBonus] = turn[1]
-      end
-    
-    end
+  
     @running_score.each do |frame|
-      total_score += frame[1] + frame[2]
+      @total_score += frame[1] + frame[2]
     end
-
-    total_score = total_score + (@bonus.sum)
+  
+    @total_score += @bonus.sum
+    running_score
   end
 
   def running_score
     puts "The Game So Far:"
-    @running_score.each do |frame|
-      puts "Frame #{@index + 1}: #{frame}"
+    frames_to_print = [10, @running_score.size].min
+    frames_to_print.times do |index|
+      frame = @running_score[index]
+      frame_info = "Frame #{index + 1}: Roll 1 = #{frame[1]}, Roll 2 = #{frame[2]}"
+      frame_info += ", Bonus = #{frame[:SpareBonus]}" if frame.include?(:SpareBonus)
+      frame_info += ", Strike Bonus 1 = #{frame[:StrikeBonus1]}, Strike Bonus 2 = #{frame[:StrikeBonus2]}" if frame.include?(:StrikeBonus1)
+      frame_info += ", Strike Bonus Roll 1 = #{frame[:bonus_roll_1]}, Strike Bonus Roll 2 = #{frame[:bonus_roll_2]}" if frame.include?(:bonus_roll_1)
+      puts frame_info
     end
+    puts "Total Score: #{@total_score}"
   end
+
+  def calculate_strike(turn)
+    
+    @bonus << turn[:bonus_roll_1]
+    @bonus << turn[:bonus_roll_2]
+    @total_score += @bonus.sum
+
+  end
+  private
+
+  def calculate_bonus(turn)
+    if @frame_index > 0 && @frame_index <= 9
+      previous_frame = @running_score[@frame_index - 1]
+
+      if previous_frame[1] == 10
+        @bonus << turn[1]
+        @bonus << turn[2]
+        previous_frame[:StrikeBonus1] = turn[1]
+        previous_frame[:StrikeBonus2] = turn[2]
+      elsif previous_frame[1] + previous_frame[2] == 10 && previous_frame[1] < 10
+        @bonus << turn[1]
+        previous_frame[:SpareBonus] = turn[1]
+      end
+
+    end
+    @frame_index += 1
   
+  end
+
+
 end

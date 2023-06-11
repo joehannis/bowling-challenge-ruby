@@ -5,26 +5,27 @@ class Game
   def initialize
     @frames = Frames.new
     @score = Score.new
-    @index = 10
+    @index = 0
   end
 
   def bowling_game
-    while @index > 0 do
+    while @index < 10 do
+      @index += 1
+
       puts "What was your score for the first roll?"
       roll = gets.chomp.to_i
       @frames.frame_no(@index)[1] = roll
-      if @index == 10 && @frames.frame_no(10)[1] == 10
-        frame_10
-
-      elsif roll < 10
+        
+      if roll < 10
         puts "What was your score for the second roll?"
         roll = gets.chomp.to_i
         @frames.frame_no(@index)[2] = roll
       end
+      if @frames.frame_no(10)[1] == 10
+        frame_10
+      end
 
       turn_calculation
-      scoresheet
-      @index -= 1
     end
   end
 
@@ -32,15 +33,9 @@ class Game
 
   def turn_calculation
     turn = @frames.frame_no(@index)
-    @total_score = @score.score_calculation(turn, @index)
+    @total_score = @score.score_calculation(turn)
   end
   
-  def scoresheet
-    @score.running_score.each_with_index do |frame, index|
-      puts "Frame #{index + 1}: #{frame[1]} #{frame[2]}"
-    end
-    puts "Total Score: #{@total_score}"
-  end
 
   def frame_10
     puts "Strike bonus roll 1 score:"
@@ -50,7 +45,10 @@ class Game
     roll = gets.chomp.to_i
     @frames.frame_no(10)[:bonus_roll_2] = roll
     turn = @frames.frame_no(10)
-    scoresheet
+    binding.irb
+    @score.calculate_strike(turn)
+
+    @score.running_score
   end
 end
 
