@@ -1,5 +1,5 @@
 class Score
-  def initialize(io = $stdout)
+  def initialize(io =$stdout)
     @running_score = []
     @bonus = []
     @frame_index = 0
@@ -30,7 +30,7 @@ class Score
   end
 
   def running_score
-    puts "The Game So Far:"
+    @io.puts "The Game So Far:"
     frames_to_print = [10, @running_score.size].min
     frames_to_print.times do |index|
       frame = @running_score[index]
@@ -41,9 +41,9 @@ class Score
       elsif frame.include?(:StrikeBonus1)
         frame_info += ", Strike Bonus 1 = #{frame[:StrikeBonus1]}, Strike Bonus 2 = #{frame[:StrikeBonus2]}"
       end
-      puts frame_info
+      @io.puts frame_info
     end
-    puts "Total Score: #{@total_score}"
+    @io.puts "Total Score: #{@total_score}"
   end
 
   def calculate_strike(turn)
