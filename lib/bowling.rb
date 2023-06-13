@@ -49,6 +49,7 @@ class Game
     @frames.frame_no(10)[:bonus_roll_1] = roll
 
     @io.puts "Strike bonus roll 2 score:"
+
     roll = @io.gets.chomp.to_i
     if roll > 10
       fail 'Please enter a valid score'
@@ -58,7 +59,7 @@ class Game
     turn = @frames.frame_no(10)
     @score.calculate_strike(turn)
 
-    @score.running_score(@io)
+    @score.running_score
   end
 
 
@@ -68,8 +69,6 @@ class Game
   end
 
   def show_total_score
-    @io.puts "The Game So Far:"
     @score.running_score
   end
 end
-
